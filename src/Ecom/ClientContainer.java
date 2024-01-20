@@ -9,12 +9,12 @@ import jade.wrapper.ControllerException;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -44,73 +44,60 @@ public class ClientContainer extends Application {
             e.printStackTrace();
         }
     }
-
     @Override
-    public void start(Stage arg0) throws Exception {
+    public void start(Stage primaryStage) {
         startContainer();
-        arg0.setTitle("Agent Interface");
-        BorderPane borderpane = new BorderPane();
-        VBox vbox = new VBox();
-        HBox hbox1 = new HBox();
-        hbox1.setPadding(new Insets(10, 0, 10, 30));
-        hbox1.setSpacing(105);
-        javafx.scene.control.Label labelpay = new javafx.scene.control.Label("Produit :");
-        javafx.scene.control.TextField textpay = new javafx.scene.control.TextField();
-        hbox1.getChildren().add(labelpay);
-        hbox1.getChildren().add(textpay);
-        HBox hbox2 = new HBox();
-        hbox2.setPadding(new Insets(0, 0, 10, 30));
-        hbox2.setSpacing(100);
-        javafx.scene.control.Label labelville = new javafx.scene.control.Label("Quantite :");
-        javafx.scene.control.TextField textville = new javafx.scene.control.TextField();
-        hbox2.getChildren().add(labelville);
-        hbox2.getChildren().add(textville);
-        HBox hbox3 = new HBox();
-        hbox3.setPadding(new Insets(0, 0, 10, 30));
-        hbox3.setSpacing(100);
-        javafx.scene.control.Label labelchambre = new javafx.scene.control.Label("Delai :");
-        javafx.scene.control.TextField textdelai = new javafx.scene.control.TextField();
+        primaryStage.setTitle("Client Interface");
 
-        hbox3.getChildren().add(labelchambre);
-        hbox3.getChildren().add(textdelai);
-        HBox hbox7 = new HBox();
-        hbox7.setPadding(new Insets(0, 0, 0, 160));
-        hbox7.setSpacing(40);
+        BorderPane borderPane = new BorderPane();
+        borderPane.setStyle("-fx-background-color: #333333;");
+
+        VBox vbox = new VBox(10);
+        vbox.setPadding(new Insets(20, 20, 20, 20));
+
+        HBox hbox1 = createField("Produit :", "textpay");
+        HBox hbox2 = createField("Quantite :", "textville");
+        HBox hbox3 = createField("Delai :", "textdelai");
+
+        HBox hbox7 = new HBox(10);
+        hbox7.setPadding(new Insets(10, 0, 0, 20));
         Button btn = new Button("Envoyer");
+        btn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
         hbox7.getChildren().add(btn);
+
         GridPane gridPane = new GridPane();
         observableList = FXCollections.observableArrayList();
         ListView<String> listView = new ListView<String>(observableList);
         gridPane.add(listView, 0, 0);
-        gridPane.setPadding(new Insets(10, 0, 10, 80));
+        gridPane.setPadding(new Insets(10, 0, 10, 0));
+
         vbox.getChildren().addAll(hbox1, hbox2, hbox3, hbox7, gridPane);
-        borderpane.setCenter(vbox);
-        Scene scene = new Scene(borderpane, 400, 600);
-        arg0.setScene(scene);
-        arg0.show();
+        vbox.setStyle("-fx-background-color: #444444; -fx-border-color: #555555; -fx-border-width: 2px;");
+        borderPane.setCenter(vbox);
 
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent arg0) {
-                String pay = textpay.getText();
-                String ville = textville.getText();
-                String chambre = textdelai.getText();
-                GuiEvent guiEvent = new GuiEvent(this, 1);
-                guiEvent.addParameter(pay);
-                guiEvent.addParameter(ville);
-                guiEvent.addParameter(chambre);
-                System.out.println("999999999999999999999999999999999999999");
+        Scene scene = new Scene(borderPane, 400, 600);
+        primaryStage.setScene(scene);
+        primaryStage.show();
 
-                System.out.println(pay);
-                System.out.println(ville);
-                System.out.println(chambre);
+        btn.setOnAction(event -> {
+            // Handle button click
+            String pay = getTextFieldText(hbox1);
+            String ville = getTextFieldText(hbox2);
+            String delai = getTextFieldText(hbox3);
 
-                System.out.println("999999999999999999999999999999999999999");
+            // Process the input or send it to the agent
+            System.out.println("Product: " + pay);
+            System.out.println("Quantity: " + ville);
+            System.out.println("Delay: " + delai);
+            GuiEvent guiEvent = new GuiEvent(this, 1);
+            guiEvent.addParameter(pay);
+            guiEvent.addParameter(ville);
+            guiEvent.addParameter(delai);
 
-                agentinterface.onGuiEvent(guiEvent);
-            }
+            agentinterface.onGuiEvent(guiEvent);
         });
     }
+ 
 
     public Client getAgentinterface() {
         return agentinterface;
@@ -123,5 +110,23 @@ public class ClientContainer extends Application {
     public void show(String message) {
         this.observableList.add(0, message);
         
+    }
+    private HBox createField(String labelText, String textFieldId) {
+        HBox hbox = new HBox(10);
+        hbox.setPadding(new Insets(0, 0, 10, 0));
+
+        Label label = new Label(labelText);
+        label.setStyle("-fx-text-fill: #ffffff;");
+
+        TextField textField = new TextField();
+        textField.setId(textFieldId);
+
+        hbox.getChildren().addAll(label, textField);
+        return hbox;
+    }
+
+    private String getTextFieldText(HBox hbox) {
+        TextField textField = (TextField) hbox.lookup("#" + hbox.getChildren().get(1).getId());
+        return textField.getText();
     }
 }

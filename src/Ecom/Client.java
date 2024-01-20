@@ -32,6 +32,8 @@ public class Client extends GuiAgent {
     protected void setup() {
         gui = (ClientContainer) getArguments()[0];
         gui.setAgentinterface(this);
+        this.registreClientinDF();
+
 
 
 
@@ -47,9 +49,7 @@ public class Client extends GuiAgent {
                                 envoyeurs.add(message.getSender());
                                 if (offres.size() == nombreAH) {
                                     AID meilleurAID = getMeilleurAID();
-                                    System.out.println(meilleurAID);
                                     for (AID agentID : envoyeurs) {
-                                    	System.out.println(agentID);
                                         ACLMessage messageCFP = new ACLMessage(ACLMessage.REJECT_PROPOSAL);
                                         if (agentID == meilleurAID) {
                                             messageCFP = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
@@ -59,6 +59,10 @@ public class Client extends GuiAgent {
                                     }
                                     if (meilleurAID == null) {
                                     	showresult("");
+                                        offreAChercher = null;
+                                        offres = new ArrayList<>();
+                                        envoyeurs = new ArrayList<>();
+                                        meilleurChoix = null;
                                     }
                                 }
                                 break;
@@ -103,8 +107,7 @@ public class Client extends GuiAgent {
 			  offreAChercher.put("Produit", product);
 			  offreAChercher.put("quantite", quantite);
 			  offreAChercher.put("delai", delai);
-			  System.out.println(offreAChercher);
-		        this.result = this.getAHListFromDF();
+		        this.result = this.getEcomListFromDF();
 		        this.nombreAH = this.result.length;
 			  sendCFPMessage(result,product,quantite);
 			 
@@ -134,15 +137,13 @@ public class Client extends GuiAgent {
         int min=100000;
 
         for (int i = 0; i < offres.size(); i++) {
-        	System.out.println(offres.get(i)+"i:"+i);
-        	
+        	if(offres.get(i)==null)
+        		continue;
             Map<String, String> offre = Utils.stringToHashMap(offres.get(i));
-            System.out.println("9999999999999999999999999999999999");            
             System.out.println(offre);
             System.out.println(offreAChercher);
-            System.out.println("9999999999999999999999999999999999");
 
-            System.out.println(Integer.parseInt(offreAChercher.get("quantite")));
+
             if (Integer.parseInt(offre.get("quantite")) >= Integer.parseInt(offreAChercher.get("quantite"))) {
             	if(min>Integer.parseInt(offre.get("prix"))) {
             		min=Integer.parseInt(offre.get("prix"));
@@ -159,7 +160,7 @@ public class Client extends GuiAgent {
 	 
 
 
-    public DFAgentDescription[] getAHListFromDF() {
+    public DFAgentDescription[] getEcomListFromDF() {
         DFAgentDescription AHDescription = new DFAgentDescription();
         ServiceDescription AHServiceDescription = new ServiceDescription();
         AHServiceDescription.setType("Commerce");
@@ -173,7 +174,19 @@ public class Client extends GuiAgent {
         }
         return result;
     }
-
+    public void registreClientinDF() {
+        DFAgentDescription description = new DFAgentDescription();
+        description.setName(getAID());
+        ServiceDescription serviceDescription = new ServiceDescription();
+        serviceDescription.setType("client");
+        serviceDescription.setName("client");
+        description.addServices(serviceDescription);
+        try {
+            DFService.register(this, description);
+        } catch (FIPAException e) {
+            e.printStackTrace();
+        }
+    }
     public void sendCFPMessage(DFAgentDescription[] result,String produit,String quantite) {
         ACLMessage messageCFP = new ACLMessage(ACLMessage.CFP);
         messageCFP.setContent("Demande des offres disponible,"+produit+","+quantite);

@@ -27,10 +27,9 @@ public class EcomContainer {
                 agentCreated = true;
             } catch (jade.wrapper.StaleProxyException e) {
                 // Handle the exception by incrementing the counter
-                e.printStackTrace();
             }
         }
-		System.out.println("d�marrage du container avec 2 agents ");
+		System.out.println("demarrage du container ");
 
 	}
 }

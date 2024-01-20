@@ -30,7 +30,7 @@ public class Ecom extends Agent {
 	@Override
     public void setup() {
         this.populateOffres();
-        this.registreAHinDF();
+        this.registreEcominDF();
         this.addBehaviour(new CyclicBehaviour() {
             @Override
             public void action() {
@@ -43,12 +43,11 @@ public class Ecom extends Agent {
                         	if (partsmessage[0].equals("Demande des offres disponible")) {
                         	    String productsearch=searchProduct(partsmessage[1]);
                         	    offrequantite=Integer.parseInt(partsmessage[2]);
-                        	    if (productsearch != null) {
+                        	    
                         	        ACLMessage reply = message.createReply();
                         	        reply.setPerformative(ACLMessage.PROPOSE);
                         	        reply.setContent(productsearch);
                         	        this.myAgent.send(reply);
-                        	    }
                         	}
                             break;
                         case ACLMessage.ACCEPT_PROPOSAL:
@@ -95,7 +94,7 @@ public class Ecom extends Agent {
         }
     }
 
-    public void registreAHinDF() {
+    public void registreEcominDF() {
         DFAgentDescription description = new DFAgentDescription();
         description.setName(getAID());
         ServiceDescription serviceDescription = new ServiceDescription();
