@@ -190,6 +190,8 @@ public class Client extends GuiAgent {
     public void sendCFPMessage(DFAgentDescription[] result,String produit,String quantite) {
         ACLMessage messageCFP = new ACLMessage(ACLMessage.CFP);
         messageCFP.setContent("Demande des offres disponible,"+produit+","+quantite);
+        if(result.length == 0)
+        	showresult("");
         for (DFAgentDescription description : result) {
             messageCFP.addReceiver(description.getName());
         }

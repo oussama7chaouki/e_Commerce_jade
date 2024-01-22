@@ -11,6 +11,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -85,16 +87,27 @@ public class ClientContainer extends Application {
             String ville = getTextFieldText(hbox2);
             String delai = getTextFieldText(hbox3);
 
-            // Process the input or send it to the agent
-            System.out.println("Product: " + pay);
-            System.out.println("Quantity: " + ville);
-            System.out.println("Delay: " + delai);
-            GuiEvent guiEvent = new GuiEvent(this, 1);
-            guiEvent.addParameter(pay);
-            guiEvent.addParameter(ville);
-            guiEvent.addParameter(delai);
+            // Check if any field is empty
+            if (pay.isEmpty() || ville.isEmpty() || delai.isEmpty()) {
+                // Show a warning alert
+                Alert alert = new Alert(AlertType.WARNING);
+                alert.setTitle("Warning");
+                alert.setHeaderText(null);
+                alert.setContentText("Please fill in all fields before proceeding!");
+                alert.showAndWait();
+            } else {
+                // Process the input or send it to the agent
+                System.out.println("Product: " + pay);
+                System.out.println("Quantity: " + ville);
+                System.out.println("Delay: " + delai);
 
-            agentinterface.onGuiEvent(guiEvent);
+                GuiEvent guiEvent = new GuiEvent(this, 1);
+                guiEvent.addParameter(pay);
+                guiEvent.addParameter(ville);
+                guiEvent.addParameter(delai);
+
+                agentinterface.onGuiEvent(guiEvent);
+            }
         });
     }
  
